@@ -1,10 +1,14 @@
 FROM public.ecr.aws/lambda/python:3.11
 
-# Install system dependencies
+# Install system dependencies (including libGL for OpenCV)
 RUN yum update -y && yum install -y \
     gcc \
     gcc-c++ \
     make \
+    libGL \
+    libGLU \
+    mesa-libGL \
+    mesa-libGLU \
     && yum clean all
 
 # Copy requirements and install Python dependencies
@@ -15,4 +19,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/lambda_function.py ${LAMBDA_TASK_ROOT}
 
 # Set the CMD to your handler
-CMD [ "lambda_function.lambda_handler" ] 
+CMD [ "lambda_function.lambda_handler" ]

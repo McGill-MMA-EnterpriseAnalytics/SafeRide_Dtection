@@ -2,7 +2,7 @@ name: Deploy YOLO API
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   workflow_dispatch:
 
 env:

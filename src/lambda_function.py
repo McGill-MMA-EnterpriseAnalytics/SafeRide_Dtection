@@ -15,9 +15,9 @@ logger.setLevel(logging.INFO)
 s3_client = boto3.client('s3')
 
 # Configuration
-MODEL_BUCKET = 'project-mma'
-MODEL_KEY = 'model/best.pt'
-BUCKET = 'project-mma'
+MODEL_BUCKET = 'is2-project'
+MODEL_KEY = 'model/best_helmet_detection_model.pt'
+BUCKET = 'is2-project'
 
 def get_model_from_s3():
     """Get model directly from S3"""

@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 # Configuration
-MODEL_PATH = "best.pt"
+MODEL_PATH = "best_helmet_detection_model.pt"
 
 class ProcessRequest(BaseModel):
     input_folder: str

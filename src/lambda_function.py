@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 from io import BytesIO
 import logging
+import tempfile
 
 # Configure logging
 logger = logging.getLogger()
@@ -20,18 +21,25 @@ MODEL_KEY = 'model/best_helmet_detection_model.pt'
 BUCKET = 'is2-project'
 
 def get_model_from_s3():
-    """Get model directly from S3"""
+    """Download YOLO model from S3 and save it as a temporary file"""
     logger.info(f"Downloading model from s3://{MODEL_BUCKET}/{MODEL_KEY}")
     try:
         response = s3_client.get_object(Bucket=MODEL_BUCKET, Key=MODEL_KEY)
         model_data = response['Body'].read()
-        logger.info("Model downloaded successfully")
-        return model_data
+
+        # Save the model to a temporary file
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pt")
+        temp_file.write(model_data)
+        temp_file.close()
+
+        logger.info(f"Model saved to temporary file: {temp_file.name}")
+        return temp_file.name  # Return the file path
+
     except Exception as e:
         logger.error(f"Error downloading model: {str(e)}")
         raise
 
-def process_image(image_data, model_data):
+def process_image(image_data, model_path):
     """Process image using YOLO model"""
     logger.info("Processing image with YOLO model")
     try:
@@ -39,11 +47,11 @@ def process_image(image_data, model_data):
         nparr = np.frombuffer(image_data, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
         
-        # Load model from bytes and make prediction
-        model = YOLO(model_data)
+        # Load model from file path (not bytes)
+        model = YOLO(model_path)
         results = model.predict(img)
         
-        # Extract predictions
+        # Extract predictions (same as before)
         predictions = []
         for result in results:
             boxes = result.boxes
@@ -105,7 +113,7 @@ def lambda_handler(event, context):
         logger.info(f"Output prefix: {output_prefix}")
         
         # Get model from S3
-        model_data = get_model_from_s3()
+        model_path = get_model_from_s3()
         
         # Get all image files from input bucket
         image_files = get_image_files(input_prefix)
@@ -136,7 +144,7 @@ def lambda_handler(event, context):
                 logger.info(f"Downloaded image: {image_key}")
                 
                 # Process image
-                predictions = process_image(image_data, model_data)
+                predictions = process_image(image_data, model_path)
                 
                 # Save predictions to S3
                 relative_path = os.path.relpath(image_key, input_prefix)

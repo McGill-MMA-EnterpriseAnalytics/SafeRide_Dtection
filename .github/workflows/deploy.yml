@@ -1,8 +1,9 @@
+# Triggered by aws-deployment branch
 name: Deploy YOLO API
 
 on:
   push:
-    branches: [ master ]
+    branches: [ aws-deployment ]
   workflow_dispatch:
 
 env:

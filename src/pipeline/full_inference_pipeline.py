@@ -1,6 +1,17 @@
 from helmet_detection import load_helmet_model, is_helmet_detected
 from number_plate_detection import load_number_plate_model, detect_number_plates
 from ocr import crop_number_plates_in_memory, recognize_license_numbers
+import yaml
+
+# Load config
+with open("config.yaml", "r") as file:
+    config = yaml.safe_load(file)
+
+# Now access values
+helmet_model_path = config["helmet_model_path"]
+plate_model_path = config["plate_model_path"]
+helmet_conf = config["helmet_confidence_threshold"]
+plate_conf = config["plate_confidence_threshold"]
 
 def run_full_inference(image_path):
     """

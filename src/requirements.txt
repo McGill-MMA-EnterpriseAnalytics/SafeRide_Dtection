@@ -4,3 +4,4 @@ ultralytics==8.1.28
 opencv-python==4.6.0.66
 numpy==1.26.4
 paddlepaddle==2.5.2
+shapely==2.0.2

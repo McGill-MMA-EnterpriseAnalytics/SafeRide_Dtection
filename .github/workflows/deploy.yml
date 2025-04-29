@@ -3,7 +3,7 @@ name: Deploy YOLO API
 
 on:
   push:
-    branches: [ aws-deployment ]
+    branches: [ master ]
   workflow_dispatch:
 
 env:

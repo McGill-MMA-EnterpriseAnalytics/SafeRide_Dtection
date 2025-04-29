@@ -1,4 +1,3 @@
-# Triggered by aws-deployment branch
 name: Deploy YOLO API
 
 on:

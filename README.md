@@ -42,6 +42,7 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
 ├── Model Explainablity/    # Notebooks for model explainability
 ├── requirements.txt        # Python dependencies
 ├── pyproject.toml, poetry.lock # Alternative dependency management
+├── config.yaml             # Main configuration file for pipeline
 ├── README.md               # Project documentation
 └── ...
 ```
@@ -78,18 +79,49 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
   ```
 - Download model weights and experiment logs from the links above and place them in the appropriate folders (`models/`, etc).
 
-### 2. **Training**
-- Training scripts are provided in the notebooks (`notebooks/helmet_detection/`, `notebooks/plate_detection/`).
-- For custom training, adapt the scripts in `src/helmet_detection/` and `src/number_plate_detection/`.
+### 2. **Configuration**
+- Edit `config.yaml` to set:
+  - Model paths (`helmet_model_path`, `plate_model_path`)
+  - Inference thresholds (`helmet_confidence_threshold`, `plate_confidence_threshold`)
+  - OCR settings (`ocr_languages`, `min_ocr_confidence`)
+  - Output and log paths (`output_folder`, `log_file`)
+  - Flags (e.g., `save_annotated_images`)
+- **Example:**
+  ```yaml
+  helmet_model_path: "models/helmet_detection_best.pt"
+  plate_model_path: "models/number_plate_detection_best.pt"
+  helmet_confidence_threshold: 0.3
+  plate_confidence_threshold: 0.3
+  ocr_languages: ["en"]
+  output_folder: "outputs/"
+  log_file: "logs/inference.log"
+  save_annotated_images: false
+  ```
+- **Note:** The pipeline script will read all settings from `config.yaml`. Make sure this file is present and correctly configured before running inference.
 
-### 3. **Inference**
-- Use the full pipeline script:
+### 3. **Training**
+
+- **Jupyter Notebooks:**
+  - Use the notebooks in `notebooks/helmet_detection/` and `notebooks/plate_detection/` for step-by-step training, evaluation, and experiment tracking with MLflow.
+  - These notebooks cover data loading, preprocessing, model training, evaluation, and saving best weights.
+
+- **Custom Training via Scripts:**
+  - Advanced users can adapt or extend the scripts in `src/helmet_detection/` and `src/number_plate_detection/` for custom training workflows or automation.
+  - You may need to modify these scripts to use your own data or integrate with the configuration system.
+
+- **Tips:**
+  - Ensure your data is in the expected format (see notebook examples).
+  - Track your experiments using MLflow for reproducibility.
+  - Save your best model weights in the `models/` directory for later inference.
+
+### 4. **Inference**
+- Run the full pipeline script:
   ```bash
   python src/pipeline/full_inference_pipeline.py
   ```
-  This will run helmet detection, number plate detection, and OCR on a sample image. Edit the script or pass your own image path as needed.
+  This will run helmet detection, number plate detection, and OCR on a sample image (edit the script to change the image path or add CLI support). All model paths, thresholds, and output locations are controlled via `config.yaml`.
 
-### 4. **Testing**
+### 5. **Testing**
 - Run unit tests to validate the codebase:
   ```bash
   pytest tests/
@@ -107,5 +139,6 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
 - The repository is modular and follows best practices for MLOps and reproducibility.
 - All heavy artifacts are stored externally to keep the repo lightweight.
 - For any issues, check the notebooks and scripts for detailed docstrings and comments.
+- **Configuration-driven:** All key parameters (model paths, thresholds, outputs, logs) are set in `config.yaml` for easy reproducibility and deployment.
 
 ---

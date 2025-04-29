@@ -136,8 +136,7 @@ def lambda_handler(event, context):
         if not output_prefix.endswith('/'):
             output_prefix += '/'
 
-        # Load models from S3
-        helmet_model_path = download_model_from_s3(HELMET_MODEL_KEY)
+        # Only load Plate Detection model
         plate_model_path = download_model_from_s3(PLATE_MODEL_KEY)
 
         paginator = s3_client.get_paginator('list_objects_v2')
@@ -153,21 +152,13 @@ def lambda_handler(event, context):
                         response = s3_client.get_object(Bucket=BUCKET, Key=key)
                         image_data = response['Body'].read()
 
-                        # Step 1: Helmet Detection
-                        helmet_results = process_helmet_detection(image_data, helmet_model_path)
+                        # Directly run Plate Detection + OCR
+                        plate_results = process_plate_detection(image_data, plate_model_path)
 
-                        if helmet_results['helmet_detected']:
-                            output = {
-                                'detection_type': 'helmet',
-                                'detections': helmet_results['detections']
-                            }
-                        else:
-                            # Step 2: Plate Detection + OCR
-                            plate_results = process_plate_detection(image_data, plate_model_path)
-                            output = {
-                                'detection_type': 'plate',
-                                'detections': plate_results
-                            }
+                        output = {
+                            'detection_type': 'plate',
+                            'detections': plate_results
+                        }
 
                         relative_path = os.path.relpath(key, input_prefix)
                         output_key = os.path.join(output_prefix, os.path.splitext(relative_path)[0] + '.json')
@@ -182,8 +173,7 @@ def lambda_handler(event, context):
                         processed_files.append({
                             'input_file': key,
                             'output_file': output_key,
-                            'detection_type': output['detection_type'],
-                            'detections_count': len(output['detections'])
+                            'detections_count': len(plate_results)
                         })
 
         return {

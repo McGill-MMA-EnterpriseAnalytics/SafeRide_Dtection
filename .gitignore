@@ -173,5 +173,10 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
+
 # Model weights files
 models/*.pt
+=======
+# Kaggle API keys
+kaggle.json
+.kaggle/

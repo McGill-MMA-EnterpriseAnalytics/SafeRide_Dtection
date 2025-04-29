@@ -1,6 +1,6 @@
 # SafeRide_Dtection
 
-Helmet and Number Plate Detection with MLflow Experiment Tracking and MLOps Pipeline
+End-to-end helmet and license plate detection system powered by YOLOv8 and EasyOCR, with MLflow experiment tracking, modular Python architecture, and production-ready MLOps pipeline for real-world deployment.
 
 ---
 

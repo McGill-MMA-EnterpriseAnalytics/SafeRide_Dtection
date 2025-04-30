@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+jinja2
+pandas
+torch
+ultralytics
+easyocr
+opencv-python
+python-multipart

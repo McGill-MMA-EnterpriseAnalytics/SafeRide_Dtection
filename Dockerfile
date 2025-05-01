@@ -15,10 +15,7 @@ RUN yum update -y && yum install -y \
 COPY src/requirements.txt ${LAMBDA_TASK_ROOT}
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 🛠 Manually install paddleocr lightweight
-RUN pip install "paddleocr>=2.6.1.3" --no-deps
-
-# Copy function code
+# Copy Lambda function code
 COPY src/lambda_function.py ${LAMBDA_TASK_ROOT}
 
 # Set the CMD to your handler

@@ -8,6 +8,8 @@ import numpy as np
 import tempfile
 import logging
 import easyocr
+import easyocr.utils
+
 
 # Configure logging
 logger = logging.getLogger()

@@ -24,10 +24,20 @@ HELMET_MODEL_KEY = 'model/best_helmet_detection_model.pt'
 PLATE_MODEL_KEY = 'model/best_plate_detection_model.pt'
 BUCKET = 'is2-project'
 
-easyocr.utils.USER_NETWORK_DIRECTORY = '/tmp/.EasyOCR/user_network'
-easyocr.utils.MODEL_STORAGE_DIRECTORY = '/tmp/.EasyOCR'
+# Force environment variables (used internally)
+os.environ['EASYOCR_USER_NETWORK_DIRECTORY'] = '/tmp/.EasyOCR/user_network'
+os.environ['EASYOCR_MODEL_STORAGE_DIRECTORY'] = '/tmp/.EasyOCR'
 
-ocr_reader = easyocr.Reader(['en'])
+# Create necessary directories manually to prevent race condition
+os.makedirs('/tmp/.EasyOCR/user_network', exist_ok=True)
+os.makedirs('/tmp/.EasyOCR', exist_ok=True)
+
+# Explicitly instantiate the Reader with those paths
+ocr_reader = easyocr.Reader(
+    ['en'],
+    model_storage_directory='/tmp/.EasyOCR',
+    user_network_directory='/tmp/.EasyOCR/user_network'
+)
 
 def download_model_from_s3(model_key):
     logger.info(f"Downloading model {model_key}")

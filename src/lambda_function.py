@@ -22,12 +22,10 @@ HELMET_MODEL_KEY = 'model/best_helmet_detection_model.pt'
 PLATE_MODEL_KEY = 'model/best_plate_detection_model.pt'
 BUCKET = 'is2-project'
 
-# Initialize EasyOCR once (only when Lambda container warms up)
-ocr_reader = easyocr.Reader(
-    ['en'],
-    model_storage_directory='/tmp/.EasyOCR',
-    user_network_directory='/tmp/.EasyOCR/user_network'
-)
+easyocr.utils.USER_NETWORK_DIRECTORY = '/tmp/.EasyOCR/user_network'
+easyocr.utils.MODEL_STORAGE_DIRECTORY = '/tmp/.EasyOCR'
+
+ocr_reader = easyocr.Reader(['en'])
 
 def download_model_from_s3(model_key):
     logger.info(f"Downloading model {model_key}")

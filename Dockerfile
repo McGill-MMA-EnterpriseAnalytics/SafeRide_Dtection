@@ -15,6 +15,8 @@ RUN yum update -y && yum install -y \
 COPY src/requirements.txt ${LAMBDA_TASK_ROOT}
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN pip install "paddleocr==2.6.1.3" -f https://paddleocr.bj.bcebos.com/whl/build.html
+
 # Copy Lambda function code
 COPY src/lambda_function.py ${LAMBDA_TASK_ROOT}
 

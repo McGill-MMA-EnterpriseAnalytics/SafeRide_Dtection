@@ -1,0 +1,20 @@
+# config.yaml
+
+# Model Paths
+helmet_model_path: "models/helmet_detection_best.pt"
+plate_model_path: "models/number_plate_detection_best.pt"
+
+# Inference Settings
+helmet_confidence_threshold: 0.3
+plate_confidence_threshold: 0.3
+
+# OCR Settings
+ocr_languages: ["en"]  # EasyOCR language codes
+min_ocr_confidence: 0.5  # Optional later, if you want to filter noisy OCR
+
+# Paths
+output_folder: "outputs/"
+log_file: "logs/inference.log"
+
+# Flags
+save_annotated_images: false  # If you want to later save detection outputs

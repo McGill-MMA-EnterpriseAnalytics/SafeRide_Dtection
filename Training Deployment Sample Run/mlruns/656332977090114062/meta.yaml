@@ -1,0 +1,6 @@
+artifact_location: file:///app/mlruns/656332977090114062
+creation_time: 1746374646415
+experiment_id: '656332977090114062'
+last_update_time: 1746374646415
+lifecycle_stage: active
+name: SafeRide_Helmet_Detection

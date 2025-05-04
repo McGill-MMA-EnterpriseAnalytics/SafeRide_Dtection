@@ -1,0 +1,6 @@
+artifact_location: file:///app/mlruns/396906744552828088
+creation_time: 1746374819494
+experiment_id: '396906744552828088'
+last_update_time: 1746374819494
+lifecycle_stage: active
+name: SafeRide_Plate_Detection

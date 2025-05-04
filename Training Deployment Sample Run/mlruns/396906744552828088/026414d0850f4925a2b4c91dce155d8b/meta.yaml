@@ -1,0 +1,15 @@
+artifact_uri: file:///app/mlruns/396906744552828088/026414d0850f4925a2b4c91dce155d8b/artifacts
+end_time: 1746374876132
+entry_point_name: ''
+experiment_id: '396906744552828088'
+lifecycle_stage: active
+run_id: 026414d0850f4925a2b4c91dce155d8b
+run_name: plate_detection_yolov8s_imgsz640_ep2
+run_uuid: 026414d0850f4925a2b4c91dce155d8b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1746374821037
+status: 3
+tags: []
+user_id: root

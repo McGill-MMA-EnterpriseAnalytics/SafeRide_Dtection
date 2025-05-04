@@ -23,14 +23,14 @@ def main():
     # Run helmet detection training
     if not args.plate_only:
         print("\n===== Running Helmet Detection Training =====")
-        result = subprocess.run([sys.executable, "/app/scripts/helmet_training_s.py"], check=False)
+        result = subprocess.run([sys.executable, "/app/scripts/helmet_training.py"], check=False)
         if result.returncode != 0:
             print(f"Warning: Helmet training exited with return code {result.returncode}")
     
     # Run plate detection training
     if not args.helmet_only:
         print("\n===== Running License Plate Detection Training =====")
-        result = subprocess.run([sys.executable, "/app/scripts/plate_training_s.py"], check=False)
+        result = subprocess.run([sys.executable, "/app/scripts/plate_training.py"], check=False)
         if result.returncode != 0:
             print(f"Warning: Plate training exited with return code {result.returncode}")
     

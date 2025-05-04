@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import os
+import random
 import shutil
 import xml.etree.ElementTree as ET
 import subprocess
@@ -12,7 +13,7 @@ import mlflow
 # Set MLflow tracking URI
 mlflow.set_tracking_uri(os.environ.get("MLFLOW_TRACKING_URI", "file:///app/mlruns"))
 
-print("Setting up environment for plate detection training...")
+print("Setting up environment for helmet detection training...")
 
 # Configure base paths for Docker
 base_dir = "/app"
@@ -24,20 +25,20 @@ os.makedirs(data_dir, exist_ok=True)
 os.makedirs(output_dir, exist_ok=True)
 
 # Download dataset if not already present
-if not os.path.exists(os.path.join(data_dir, "plate_data")):
-    print("Downloading License Plate Detection dataset from Kaggle...")
-    subprocess.run(["kaggle", "datasets", "download", "-d", "aslanahmedov/number-plate-detection", "--path", data_dir], check=True)
-    subprocess.run(["unzip", os.path.join(data_dir, "number-plate-detection.zip"), "-d", os.path.join(data_dir, "plate_data")], check=True)
+if not os.path.exists(os.path.join(data_dir, "helmet_data")):
+    print("Downloading Helmet Detection dataset from Kaggle...")
+    subprocess.run(["kaggle", "datasets", "download", "-d", "andrewmvd/helmet-detection", "--path", data_dir], check=True)
+    subprocess.run(["unzip", os.path.join(data_dir, "helmet-detection.zip"), "-d", os.path.join(data_dir, "helmet_data")], check=True)
 else:
-    print("Using existing plate dataset...")
+    print("Using existing helmet dataset...")
 
 # Paths for data processing
-base_path = os.path.join(data_dir, "plate_data")
+base_path = os.path.join(data_dir, "helmet_data")
 images_path = os.path.join(base_path, "images")
-annotations_path = os.path.join(base_path, "images")  # Annotations are in same dir as images
-output_path = os.path.join(data_dir, "plate_data_split")  # New base folder
+annotations_path = os.path.join(base_path, "annotations")
+output_path = os.path.join(data_dir, "helmet_data_split")  # New base folder
 
-print("Preparing plate dataset with train/val split...")
+print("Preparing dataset with train/val split...")
 
 # Create output folders
 for split in ['train', 'val']:
@@ -45,11 +46,11 @@ for split in ['train', 'val']:
     os.makedirs(os.path.join(output_path, split, 'labels'), exist_ok=True)
 
 # Step 1: Find all images that have corresponding annotations
-image_files = [f for f in os.listdir(images_path) if f.endswith('.jpeg')]
+image_files = [f for f in os.listdir(images_path) if f.endswith('.png')]
 annotation_files = [f.replace('.xml', '') for f in os.listdir(annotations_path) if f.endswith('.xml')]
 
 # Keep only images that have annotations
-valid_images = [f for f in image_files if f.replace('.jpeg', '') in annotation_files]
+valid_images = [f for f in image_files if f.replace('.png', '') in annotation_files]
 
 print(f"Total valid images with annotations: {len(valid_images)}")
 
@@ -69,8 +70,12 @@ def convert_annotation(xml_file, txt_file):
     with open(txt_file, 'w') as f:
         for obj in root.findall('object'):
             cls = obj.find('name').text
-            # Assuming 'plate' is class 0
-            cls_id = 0
+            # Map class name to class ID (0 for helmet, 1 for no-helmet)
+            if cls.lower() == 'helmet':
+                cls_id = 0
+            else:
+                cls_id = 1  # Default to 'no-helmet' or other class
+            
             xmlbox = obj.find('bndbox')
             xmin = int(xmlbox.find('xmin').text)
             xmax = int(xmlbox.find('xmax').text)
@@ -93,11 +98,11 @@ for split_name, img_list in splits.items():
         shutil.copy(img_src, img_dst)
 
         # Convert annotation
-        xml_file = os.path.join(annotations_path, img_file.replace('.jpeg', '.xml'))
-        txt_file = os.path.join(output_path, split_name, 'labels', img_file.replace('.jpeg', '.txt'))
+        xml_file = os.path.join(annotations_path, img_file.replace('.png', '.xml'))
+        txt_file = os.path.join(output_path, split_name, 'labels', img_file.replace('.png', '.txt'))
         convert_annotation(xml_file, txt_file)
 
-print("✅ Full plate dataset with train/val split prepared successfully!")
+print("✅ Full dataset with train/val split prepared successfully!")
 
 # Create YAML file for YOLO
 dataset_yaml = {
@@ -105,7 +110,8 @@ dataset_yaml = {
     "train": "train/images",
     "val": "val/images",
     "names": {
-        0: "plate"
+        0: "helmet",
+        1: "no-helmet"
     }
 }
 
@@ -113,24 +119,24 @@ yaml_path = os.path.join(output_path, "dataset.yaml")
 with open(yaml_path, 'w') as f:
     yaml.dump(dataset_yaml, f, default_flow_style=False)
 
-print("✅ dataset.yaml created for YOLO plate detection training!")
+print("✅ dataset.yaml created for YOLO training!")
 
 # Start MLflow tracking
-mlflow.set_experiment("SafeRide_Plate_Detection")
+mlflow.set_experiment("SafeRide_Helmet_Detection")
 
 # Training model with YOLO
-print("Starting plate detection model training...")
+print("Starting helmet detection model training...")
 from ultralytics import YOLO
 
 # Training settings
-model_type = 'yolov8s.pt'
-imgsz = 960
-epochs = 60
+model_type = 'yolov8m.pt'
+imgsz = 800
+epochs = 200
 patience = 20
 batch_size = 16
 data_path = yaml_path
 save_dir = os.path.join(base_dir, "runs")
-run_name = f"plate_detection_{model_type.replace('.pt','')}_imgsz{imgsz}_ep{epochs}"
+run_name = f"helmet_detection_{model_type.replace('.pt','')}_imgsz{imgsz}_ep{epochs}"
 
 # Start MLflow run
 with mlflow.start_run(run_name=run_name):
@@ -153,33 +159,34 @@ with mlflow.start_run(run_name=run_name):
         project=save_dir,
         name=run_name,
         batch=batch_size,
-        device=0,
+        device=0,  # Can be passed as an argument or env variable
         workers=4,
-        optimizer='AdamW',
+        optimizer='SGD',
         lr0=0.001,
-        lrf=0.01,
-        weight_decay=0.01,
-        momentum=0.9,
+        lrf=0.1,
+        weight_decay=0.0005,
+        momentum=0.937,
         patience=patience,
-        close_mosaic=20,
         cache=True,
         save_period=10,
         exist_ok=True,
         
         # Augmentations
         augment=True,
-        mosaic=0.0,
-        mixup=0.0,
+        conf=0.5,
+        iou=0.5,
+        mosaic=0.3,
+        mixup=0.1,
         hsv_h=0.01,
         hsv_s=0.3,
         hsv_v=0.2,
         flipud=0.0,
-        fliplr=0.1,
-        degrees=5.0,
+        fliplr=0.3,
+        degrees=3.0,
         translate=0.05,
         scale=0.1,
-        shear=0.0,
-        perspective=0.005,
+        shear=0.05,
+        perspective=0.0,
         amp=True,
         agnostic_nms=False,
     )
@@ -191,10 +198,10 @@ with mlflow.start_run(run_name=run_name):
     
     # Save model to the output directory
     final_model_path = os.path.join(save_dir, run_name, "weights", "best.pt")
-    output_model_path = os.path.join(output_dir, "Final_Plates.pt")
+    output_model_path = os.path.join(output_dir, "Final_Helmet.pt")
     
     shutil.copy(final_model_path, output_model_path)
-    print(f"✅ Plate detection model saved to {output_model_path}")
+    print(f"✅ Helmet model saved to {output_model_path}")
     
     # Log artifacts
     mlflow.log_artifact(final_model_path, "model")
@@ -206,4 +213,4 @@ with mlflow.start_run(run_name=run_name):
     if os.path.exists(os.path.join(plots_dir, "results.csv")):
         mlflow.log_artifact(os.path.join(plots_dir, "results.csv"), "plots")
 
-print("✅ Plate detection training completed successfully!")
+print("✅ Helmet detection training completed successfully!")

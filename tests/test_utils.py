@@ -4,7 +4,7 @@ import os
 
 def test_draw_bounding_boxes():
     bboxes = [[10, 10, 100, 100]]
-    img = draw_bounding_boxes("tests/dummy_images/plate.jpg", bboxes)
+    img = draw_bounding_boxes("tests/dummy_images/plate.jpeg", bboxes)
     assert img is not None
 
 def test_setup_logger():

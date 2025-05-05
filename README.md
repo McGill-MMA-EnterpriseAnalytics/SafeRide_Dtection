@@ -26,24 +26,29 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
 
 ```
 .
-├── data/                   # Data storage (user-provided, not versioned)
-├── models/                 # Trained model weights (.pt files)
-├── notebooks/              # Experimentation and training notebooks
+├── data/                           # Data storage (user-provided, not versioned)
+├── models/                         # Trained model weights (.pt files)
+├── notebooks/                      # Experimentation and training notebooks
 │   ├── helmet_detection/
-│   └── plate_detection/
-├── outputs/                # Inference results, logs, etc.
-├── src/                    # Source code
+│   ├── plate_detection/
+│   └── Model Bias/                 # Notebooks for model bias analysis
+├── outputs/                        # Inference results, logs, etc.
+├── src/                            # Source code
 │   ├── helmet_detection/
 │   ├── number_plate_detection/
 │   ├── ocr/
 │   ├── pipeline/
 │   └── utils/
-├── tests/                  # Unit tests
-├── Model Explainablity/    # Notebooks for model explainability
-├── requirements.txt        # Python dependencies
-├── pyproject.toml, poetry.lock # Alternative dependency management
-├── config.yaml             # Main configuration file for pipeline
-├── README.md               # Project documentation
+├── tests/                          # Unit tests and dummy images
+├── Model Explainablity/            # Notebooks for model explainability
+├── Training Deployment/            # Dockerized training pipeline and scripts
+├── Training Deployment Sample Run/ # Sample run for training pipeline in Docker
+├── Nehal Docker Serving App/       # FastAPI app for model serving (inference API)
+├── project_is2/                    # Python virtual environment (optional, for local dev)
+├── requirements.txt                # Python dependencies
+├── pyproject.toml, poetry.lock     # Alternative dependency management
+├── config.yaml                     # Main configuration file for pipeline
+├── README.md                       # Project documentation
 └── ...
 ```
 
@@ -61,7 +66,7 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
 
 ## 🧪 Experimentation & Modeling
 
-- **Notebooks**: All experimentation, training, and evaluation are in `notebooks/helmet_detection/` and `notebooks/plate_detection/`.
+- **Notebooks**: All experimentation, training, and evaluation are in `notebooks/helmet_detection/`, `notebooks/plate_detection/`, and model bias analysis in `notebooks/Model Bias/`.
 - **Modeling**: YOLOv8 models for helmet and number plate detection. Custom scripts in `src/helmet_detection/` and `src/number_plate_detection/`.
 - **Data Preprocessing**: Data is expected in standard image formats. Preprocessing steps are detailed in the notebooks and utility scripts.
 - **Experiment Tracking**: MLflow is used for tracking experiments, metrics, and model versions (see external link above).
@@ -126,12 +131,60 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
   ```bash
   pytest tests/
   ```
+- The `tests/` directory includes unit tests for all major modules and uses dummy images for validation.
+
+---
+
+## 🚀 Model Serving & Deployment
+
+### FastAPI Docker App
+
+The `Nehal Docker Serving App/` directory contains a production-ready FastAPI application for serving helmet and number plate detection models via REST API.
+
+- **Location:** `Nehal Docker Serving App/project-root/`
+- **Key files:**
+  - `main.py`, `model_handler.py` (in `app/`): FastAPI app and model logic
+  - `Final_Helmet.pt`, `Final_Plates.pt`: Model weights
+  - `Dockerfile`: Containerizes the API for deployment
+
+#### To build and run the API locally:
+```bash
+cd "Nehal Docker Serving App/project-root"
+docker build -t saferide-serving .
+docker run -p 8000:8000 saferide-serving
+```
+The API will be available at `http://localhost:8000`.
+
+---
+
+### Training with Docker
+
+The `Training Deployment/` and `Training Deployment Sample Run/` directories provide a fully containerized training pipeline for reproducible experiments.
+
+- **Key files:**
+  - `Dockerfile`, `docker-compose.yml`: For building and orchestrating the training environment
+  - `scripts/helmet_training.py`, `scripts/plate_training.py`, `scripts/run_training.py`: Training scripts for each task
+  - `README.md` in each directory: Detailed usage instructions
+
+#### To run training in Docker:
+```bash
+cd "Training Deployment"
+docker-compose up --build
+```
+See the respective `README.md` files in each directory for more details and sample runs.
 
 ---
 
 ## 🧑‍🔬 Model Explainability
 
 - See the `Model Explainablity/` directory for Jupyter notebooks analyzing model bias and explainability.
+
+---
+
+## 🛠️ Utilities
+
+- The `src/utils/` directory contains utility modules for logging, file handling, and drawing.
+- The `src/ocr/` directory provides OCR utility functions.
 
 ---
 

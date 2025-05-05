@@ -23,28 +23,45 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
 ---
 
 ## 🗂️ Project Structure
+
 ```
 .
-├── AWS Deployment/                 # Infrastructure & deployment assets for AWS
-│   ├── src/                            # Source code
-│   ├── Dockerfile                  # AWS-specific Dockerfile
-│   └── AWS_Deployment.md           # Documentation for AWS deployment
-├── Nehal Docker Serving App/       # FastAPI app for real-time inference
-├── notebooks/                      # Jupyter notebooks (training, analysis, bias checking)
-├── project_is2/                    # Local Python virtual environment (optional)
-├── tests/                          # Unit tests and dummy test images
-├── Training Deployment/            # Training pipeline (with drift detection, Docker-ready)
-│   ├── scripts/                    # Helmet/plate training + YOLO integration
-│   ├── scripts-drift/              # Drift detection modules (optional separate location)
-│   ├── run_training.py             # Entrypoint for pipeline execution
-│   ├── Dockerfile                  # Main training Dockerfile
-│   └── requirements.txt            # Dependencies for training container
-├── Training Deployment Sample Run/ # Example output from running the training container
-├── .gitignore
-├── config.yaml                     # Global config file
-├── pyproject.toml, poetry.lock     # Project dependency management (Poetry)
-├── README.md                       # Main project documentation
-└── requirements.txt                # Flat list of Python dependencies (if not using Poetry)
+├── data/                           # Data storage (user-provided, not versioned)
+├── models/                         # Trained model weights (.pt files)
+├── notebooks/                      # Experimentation and training notebooks
+│   ├── helmet_detection/
+│   ├── plate_detection/
+│   └── Model Bias/                 # Notebooks for model bias analysis
+├── outputs/                        # Inference results, logs, etc.
+├── src/                            # Source code
+│   ├── helmet_detection/
+│   ├── number_plate_detection/
+│   ├── ocr/
+│   ├── pipeline/
+│   └── utils/
+├── tests/                          # Unit tests and dummy images
+├── Model Explainablity/            # Notebooks for model explainability
+├── Training Deployment/            # Dockerized training pipeline and scripts
+├── Training Deployment Sample Run/ # Sample run for training pipeline in Docker
+├── serving_app/                    # FastAPI app for model serving (inference API)
+│   ├── app/                        # Main application code
+│   │   ├── __init__.py
+│   │   ├── main.py                 # FastAPI entrypoint
+│   │   ├── model_handler.py        # Model loading/inference logic
+│   │   ├── templates/              # (Optional) Jinja2 templates for HTML responses
+│   │   └── static/                 # (Optional) Static files (CSS, JS, images)
+│   ├── models/                     # Model weights (.pt files)
+│   │   ├── helmet_detection.pt
+│   │   └── plate_detection.pt
+│   ├── requirements.txt            # Python dependencies
+│   ├── Dockerfile                  # Docker build file
+│   └── README.md                   # App-specific documentation
+├── project_is2/                    # Python virtual environment (optional, for local dev)
+├── requirements.txt                # Python dependencies
+├── pyproject.toml, poetry.lock     # Alternative dependency management
+├── config.yaml                     # Main configuration file for pipeline
+├── README.md                       # Project documentation
+└── ...
 ```
 
 ---
@@ -134,17 +151,17 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
 
 ### FastAPI Docker App
 
-The `Nehal Docker Serving App/` directory contains a production-ready FastAPI application for serving helmet and number plate detection models via REST API.
+The `serving_app/` directory contains a production-ready FastAPI application for serving helmet and number plate detection models via REST API.
 
-- **Location:** `Nehal Docker Serving App/project-root/`
+- **Location:** `serving_app/`
 - **Key files:**
-  - `main.py`, `model_handler.py` (in `app/`): FastAPI app and model logic
-  - `Final_Helmet.pt`, `Final_Plates.pt`: Model weights
+  - `app/main.py`, `app/model_handler.py`: FastAPI app and model logic
+  - `models/helmet_detection.pt`, `models/plate_detection.pt`: Model weights
   - `Dockerfile`: Containerizes the API for deployment
 
 #### To build and run the API locally:
 ```bash
-cd "Nehal Docker Serving App/project-root"
+cd serving_app
 docker build -t saferide-serving .
 docker run -p 8000:8000 saferide-serving
 ```

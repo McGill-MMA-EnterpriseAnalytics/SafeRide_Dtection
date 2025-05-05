@@ -74,6 +74,8 @@ Training Deployment/
 
 helmet_training.py and plate_training.py are created based on ```Helmet_detection_v2_extended_training.ipynb``` and ```Number_plate_detection_v2_extended_training.ipynb``` from the notebooks folder. I used ```jupyter nbconvert``` to convert the ```.ipynb``` files to ```.py``` files and made additional changes to make it work for the deployment with docker.
 
+Note: If not training for the first time, and want to check data drift on new data, scripts_drift (instead of scripts) will have the main code files. Logic is similar and a you may find a separate README.md file there.
+
 ### Trained Models
 
 After training completes, the final models will be available in the `models` directory:

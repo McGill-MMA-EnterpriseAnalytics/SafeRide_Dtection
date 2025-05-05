@@ -3,8 +3,8 @@ from torchvision.ops import nms
 from ultralytics.nn.tasks import DetectionModel
 
 torch.serialization.add_safe_globals([DetectionModel])
-helmet_model = torch.load("Final_Helmet.pt", map_location="cpu", weights_only=False)['model'].eval()
-plate_model = torch.load("Final_Plates.pt", map_location="cpu", weights_only=False)['model'].eval()
+helmet_model = torch.load("./models/helmet_detection.pt", map_location="cpu", weights_only=False)['model'].eval()
+plate_model = torch.load("./models/plate_detection.pt", map_location="cpu", weights_only=False)['model'].eval()
 reader = easyocr.Reader(['en'], gpu=False)
 
 HELMET_CONF_THRESH = 0.5

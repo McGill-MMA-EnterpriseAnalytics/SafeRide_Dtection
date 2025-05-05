@@ -26,9 +26,9 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
 ```
 .
 ├── AWS Deployment/                 # Infrastructure & deployment assets for AWS
+│   ├── src/                            # Source code
 │   ├── Dockerfile                  # AWS-specific Dockerfile
 │   └── AWS_Deployment.md           # Documentation for AWS deployment
-├── Inference/                      # Inference pipeline modules
 ├── Nehal Docker Serving App/       # FastAPI app for real-time inference
 ├── notebooks/                      # Jupyter notebooks (training, analysis, bias checking)
 ├── project_is2/                    # Local Python virtual environment (optional)

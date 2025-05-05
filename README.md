@@ -23,33 +23,28 @@ Many road accidents involve riders not wearing helmets. Automating helmet and nu
 ---
 
 ## 🗂️ Project Structure
-
 ```
 .
-├── data/                           # Data storage (user-provided, not versioned)
-├── models/                         # Trained model weights (.pt files)
-├── notebooks/                      # Experimentation and training notebooks
-│   ├── helmet_detection/
-│   ├── plate_detection/
-│   └── Model Bias/                 # Notebooks for model bias analysis
-├── outputs/                        # Inference results, logs, etc.
-├── src/                            # Source code
-│   ├── helmet_detection/
-│   ├── number_plate_detection/
-│   ├── ocr/
-│   ├── pipeline/
-│   └── utils/
-├── tests/                          # Unit tests and dummy images
-├── Model Explainablity/            # Notebooks for model explainability
-├── Training Deployment/            # Dockerized training pipeline and scripts
-├── Training Deployment Sample Run/ # Sample run for training pipeline in Docker
-├── Nehal Docker Serving App/       # FastAPI app for model serving (inference API)
-├── project_is2/                    # Python virtual environment (optional, for local dev)
-├── requirements.txt                # Python dependencies
-├── pyproject.toml, poetry.lock     # Alternative dependency management
-├── config.yaml                     # Main configuration file for pipeline
-├── README.md                       # Project documentation
-└── ...
+├── AWS Deployment/                 # Infrastructure & deployment assets for AWS
+│   ├── Dockerfile                  # AWS-specific Dockerfile
+│   └── AWS_Deployment.md           # Documentation for AWS deployment
+├── Inference/                      # Inference pipeline modules
+├── Nehal Docker Serving App/       # FastAPI app for real-time inference
+├── notebooks/                      # Jupyter notebooks (training, analysis, bias checking)
+├── project_is2/                    # Local Python virtual environment (optional)
+├── tests/                          # Unit tests and dummy test images
+├── Training Deployment/            # Training pipeline (with drift detection, Docker-ready)
+│   ├── scripts/                    # Helmet/plate training + YOLO integration
+│   ├── scripts-drift/              # Drift detection modules (optional separate location)
+│   ├── run_training.py             # Entrypoint for pipeline execution
+│   ├── Dockerfile                  # Main training Dockerfile
+│   └── requirements.txt            # Dependencies for training container
+├── Training Deployment Sample Run/ # Example output from running the training container
+├── .gitignore
+├── config.yaml                     # Global config file
+├── pyproject.toml, poetry.lock     # Project dependency management (Poetry)
+├── README.md                       # Main project documentation
+└── requirements.txt                # Flat list of Python dependencies (if not using Poetry)
 ```
 
 ---
